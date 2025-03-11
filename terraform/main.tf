@@ -12,29 +12,23 @@ provider "aws" {
   profile = "dev"
 }
 
-resource "aws_s3_bucket" "bucket1" {
+resource "aws_s3_bucket" "resume-website-bucket" {
   bucket = "eri-resume-site"
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access" {
-  bucket = aws_s3_bucket.bucket1.id
+  bucket = aws_s3_bucket.resume-website-bucket.id
 }
 
 
-resource "aws_s3_object" "website" {
-  bucket       = aws_s3_bucket.bucket1.id
+resource "aws_s3_object" "resume-website" {
+  bucket       = aws_s3_bucket.resume-website-bucket.id
   key          = "index.html"
   source       = "../static-website/index.html"
   content_type = "text/html"
   source_hash  = filemd5("../static-website/index.html")
 }
 
-resource "aws_s3_bucket_website_configuration" "website_config" {
-  bucket = aws_s3_bucket.bucket1.id
-  index_document {
-    suffix = "index.html"
-  }
-}
 
 # CLOUDFRONT SETUP 
 
@@ -49,12 +43,12 @@ resource "aws_cloudfront_distribution" "s3_distribution_oac" {
   enabled = true
 
   origin {
-    domain_name              = aws_s3_bucket.bucket1.bucket_regional_domain_name
+    domain_name              = aws_s3_bucket.resume-website-bucket.bucket_regional_domain_name
     origin_id                = "PrivateS3Origin"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
 
-  # Use a built-in AWS-managed cache policy
+  # Use built-in AWS-managed cache policy
   default_cache_behavior {
     target_origin_id       = "PrivateS3Origin"
     viewer_protocol_policy = "redirect-to-https"
@@ -78,7 +72,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_oac" {
 
 # Bucket policy that allows ONLY the CloudFront distribution (via OAC) to retrieve objects
 resource "aws_s3_bucket_policy" "private_bucket_policy" {
-  bucket = aws_s3_bucket.bucket1.id
+  bucket = aws_s3_bucket.resume-website-bucket.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -90,7 +84,7 @@ resource "aws_s3_bucket_policy" "private_bucket_policy" {
           AWS = "*"
         }
         Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.bucket1.arn}/*"
+        Resource = "${aws_s3_bucket.resume-website-bucket.arn}/*"
         Condition = {
           StringEquals = {
             "AWS:SourceArn" = aws_cloudfront_distribution.s3_distribution_oac.arn
