@@ -1,0 +1,11 @@
+# Ignore Terraform state files
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Ignore local AWS credentials
+.aws/
+*.pem
+
+# Ignore environment variable files if used
+.env
