@@ -7,10 +7,26 @@ terraform {
   }
 }
 
+################################################
+# Default provider (ap-northeast-1)
+################################################
 provider "aws" {
   region  = "ap-northeast-1"
   profile = "dev"
 }
+
+################################################
+# Aliased provider for us-east-1
+################################################
+provider "aws" {
+  alias   = "us_east_1"
+  region  = "us-east-1"
+  profile = "dev"
+}
+
+###############################################################################
+# S3 bucket
+###############################################################################
 
 resource "aws_s3_bucket" "resume-website-bucket" {
   bucket = "eri-resume-site"
@@ -24,13 +40,15 @@ resource "aws_s3_bucket_public_access_block" "public_access" {
 resource "aws_s3_object" "resume-website" {
   bucket       = aws_s3_bucket.resume-website-bucket.id
   key          = "index.html"
-  source       = "../static-website/index.html"
+  source       = "../../static-website/index.html"
   content_type = "text/html"
-  source_hash  = filemd5("../static-website/index.html")
+  source_hash  = filemd5("../../static-website/index.html")
 }
 
 
-# CLOUDFRONT SETUP 
+###############################################################################
+# Cloudfront Setup
+###############################################################################
 
 resource "aws_cloudfront_origin_access_control" "oac" {
   name                              = "example-oac"
@@ -41,6 +59,12 @@ resource "aws_cloudfront_origin_access_control" "oac" {
 
 resource "aws_cloudfront_distribution" "s3_distribution_oac" {
   enabled = true
+  default_root_object = "index.html"
+
+  aliases = [
+    "eriyawata.com",
+    "www.eriyawata.com"
+  ]
 
   origin {
     domain_name              = aws_s3_bucket.resume-website-bucket.bucket_regional_domain_name
@@ -48,7 +72,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oac" {
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
 
-  # Use built-in AWS-managed cache policy
   default_cache_behavior {
     target_origin_id       = "PrivateS3Origin"
     viewer_protocol_policy = "redirect-to-https"
@@ -56,7 +79,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oac" {
     cached_methods         = ["GET", "HEAD"]
 
     cache_policy_id         = "658327ea-f89d-4fab-a63d-7e88639e58f6"  # "Managed-CachingOptimized"
-    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" # "Managed-AllViewer"
   }
 
   restrictions {
@@ -66,11 +88,12 @@ resource "aws_cloudfront_distribution" "s3_distribution_oac" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn = aws_acm_certificate_validation.eriyawata_cert_validation.certificate_arn
+    ssl_support_method = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 }
 
-# Bucket policy that allows ONLY the CloudFront distribution (via OAC) to retrieve objects
 resource "aws_s3_bucket_policy" "private_bucket_policy" {
   bucket = aws_s3_bucket.resume-website-bucket.id
 
@@ -78,10 +101,10 @@ resource "aws_s3_bucket_policy" "private_bucket_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowCloudFrontOriginAccessControl"
+        Sid    = "AllowCloudFrontServicePrincipal"
         Effect = "Allow"
         Principal = {
-          AWS = "*"
+          "Service": "cloudfront.amazonaws.com"
         }
         Action   = "s3:GetObject"
         Resource = "${aws_s3_bucket.resume-website-bucket.arn}/*"
@@ -93,8 +116,4 @@ resource "aws_s3_bucket_policy" "private_bucket_policy" {
       }
     ]
   })
-}
-
-output "cloudfront_domain_name" {
-  value = aws_cloudfront_distribution.s3_distribution_oac.domain_name
 }

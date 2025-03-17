@@ -2,6 +2,7 @@
 *.tfstate
 *.tfstate.backup
 .terraform/
+.terraform.lock.hcl
 
 # Ignore local AWS credentials
 .aws/
