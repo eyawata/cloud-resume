@@ -63,7 +63,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_oac" {
 
   aliases = [
     "eriyawata.com",
-    "www.eriyawata.com"
+    "*.eriyawata.com"
   ]
 
   origin {

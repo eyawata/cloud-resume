@@ -4,7 +4,7 @@ resource "aws_acm_certificate" "eriyawata_cert" {
     validation_method = "DNS"
 
     subject_alternative_names = [
-        "www.eriyawata.com"
+        "*.eriyawata.com"
     ]
 }
 
