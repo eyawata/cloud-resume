@@ -1,12 +1,32 @@
-# Ignore Terraform state files
+# Terraform state files
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 .terraform/
 .terraform.lock.hcl
 
-# Ignore local AWS credentials
-.aws/
+# Local environment secrets
 *.pem
+*.key
+*.crt
+*.env
 
-# Ignore environment variable files if used
-.env
+# Terraform variable files
+*.auto.tfvars
+*.auto.tfvars.json
+terraform.tfvars
+terraform.tfvars.json
+
+# AWS credentials
+.aws/
+*.csv
+
+# IDE/editor junk
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*~
+
+# Log/debug output
+*.log
+*.bak

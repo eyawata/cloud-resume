@@ -1,5 +1,5 @@
 ###############################################################################
-# main-account-providers.tf
+# DNS account/Domain hosted zone owner
 ###############################################################################
 terraform {
     required_providers {
@@ -15,48 +15,59 @@ provider "aws" {
     profile = "main"
 }
 
+resource "aws_iam_role" "allow_cert_dns_access" {
+    name = "AllowCertDNSAccess"
 
+    assume_role_policy = jsonencode({
+        Version = "2012-10-17",
+        Statement = [{
+            Effect = "Allow",
+            Principal = {
+                AWS = "arn:aws:iam::${var.dev_account_id}:root"
+            },
+            Action = "sts:AssumeRole"
+        }]
+    })
+}
+resource "aws_iam_role_policy" "cert_dns_policy" {
+    name = "AllowCertDnsValidation"
+    role = aws_iam_role.allow_cert_dns_access.id
 
-###############################################################################
-# route53-alias.tf
-###############################################################################
-# You pass in the distribution domain name and domain zone ID from the test account's 
-# output (via pipeline variable).
-data "aws_route53_zone" "eriyawata_zone" {
-    name         = "eriyawata.com."
+    policy = jsonencode({
+        Version = "2012-10-17",
+        Statement = [
+        {
+            Effect = "Allow",
+            Action = [
+            "route53:ChangeResourceRecordSets",
+            "route53:GetHostedZone",
+            "route53:ListResourceRecordSets",
+            "route53:ListHostedZones",
+            "route53:GetChange"
+            ],
+            Resource = "arn:aws:route53:::hostedzone/${var.hosted_zone_id}"
+        },
+        {
+        Effect = "Allow",
+        Action = "route53:GetChange",
+        Resource = "arn:aws:route53:::change/*"
+        },
+        {
+            Effect = "Allow",
+            Action = [
+            "s3:GetObject",
+            "s3:GetBucketLocation",
+            "s3:GetBucketPolicy",
+            "s3:GetBucketPublicAccessBlock",
+            "s3:PutBucketPolicy"
+            ],
+            Resource = "*"
+        }
+        ]
+    })
+}
+
+data "aws_route53_zone" "zone" {
+    name = var.domain_name
     private_zone = false
-}
-
-variable "cloudfront_domain_name" {
-    type = string
-}
-
-variable "cloudfront_hosted_zone_id" {
-    type    = string
-}
-
-# For apex domain: eriyawata.com
-resource "aws_route53_record" "apex_alias" {
-    zone_id = data.aws_route53_zone.eriyawata_zone.zone_id
-    name    = "eriyawata.com"
-    type    = "A"
-
-    alias {
-    name                   = var.cloudfront_domain_name
-    zone_id                = var.cloudfront_hosted_zone_id
-    evaluate_target_health = false
-    }
-}
-
-# For subdomain: www.eriyawata.com
-resource "aws_route53_record" "www_alias" {
-    zone_id = data.aws_route53_zone.eriyawata_zone.zone_id
-    name    = "www.eriyawata.com"
-    type    = "A"
-
-    alias {
-    name                   = var.cloudfront_domain_name
-    zone_id                = var.cloudfront_hosted_zone_id
-    evaluate_target_health = false
-    }
 }
