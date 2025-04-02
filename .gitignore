@@ -16,6 +16,9 @@
 terraform.tfvars
 terraform.tfvars.json
 
+# Terraform backend configuration
+backend.config
+
 # AWS credentials
 .aws/
 *.csv

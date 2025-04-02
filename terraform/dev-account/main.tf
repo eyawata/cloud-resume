@@ -5,6 +5,10 @@ terraform {
       version = "5.89.0"
     }
   }
+
+    backend "s3" {
+      # Backend config hidden in local file for security purposes
+    }
 }
 
 # Default profile
@@ -33,7 +37,7 @@ module "cert" {
   domain_name    = var.domain_name
 
   providers = {
-    aws = aws.us_east_1_dev   # for ACM
+    aws = aws.us_east_1_dev   # account for ACM
   }
 }
 
