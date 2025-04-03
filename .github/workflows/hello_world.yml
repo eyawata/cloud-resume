@@ -1,0 +1,25 @@
+name: "Hello World OIDC"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read # Required to check out repo
+
+jobs:
+  hello-world:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # https://github.com/actions/checkout
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4 # https://github.com/aws-actions/configure-aws-credentials
+        with:
+          role-to-assume: arn:aws:iam::908027398248:role/github-actions
+          aws-region: us-west-2
+
+      - name: Verify AWS access
+        run: aws s3 ls

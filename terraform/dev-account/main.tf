@@ -137,3 +137,8 @@ resource "aws_iam_role_policy_attachment" "attach_github_policy" {
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
+
+output "github_actions_role_arn" {
+  description = "IAM Role ARN for GitHub Actions in dev account"
+  value       = aws_iam_role.github_actions.arn
+}
