@@ -8,6 +8,7 @@ terraform {
 
     backend "s3" {
       # Backend config hidden in local file for security purposes
+      # updated and run with: terraform init -backend-config=backend.config 
     }
 }
 
