@@ -19,7 +19,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4 # https://github.com/aws-actions/configure-aws-credentials
         with:
           role-to-assume: arn:aws:iam::908027398248:role/github-actions
-          aws-region: us-west-2
+          aws-region: ap-northeast-1
 
       - name: Verify AWS access
         run: aws s3 ls
