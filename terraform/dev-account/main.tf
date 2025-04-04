@@ -135,7 +135,7 @@ resource "aws_iam_role" "github_actions" {
 # Attach AWS-managed AdministratorAccess policy to Role
 resource "aws_iam_role_policy_attachment" "attach_github_policy" {
   role       = aws_iam_role.github_actions.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
 }
 
 output "github_actions_role_arn" {
