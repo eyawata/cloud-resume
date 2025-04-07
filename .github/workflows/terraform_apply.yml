@@ -46,6 +46,7 @@ jobs:
             -backend-config="lock_table=${{ secrets.BACKEND_DYNAMO_TABLE }}" \
             -backend-config="key=${{ secrets.BACKEND_KEY }}" \
             -backend-config="region=${{ secrets.AWS_BACKEND_REGION }}"
+            -out plan.out
       
           terraform plan \
             -var "hosted_zone_id=${{ secrets.HOSTED_ZONE_ID }}" \
