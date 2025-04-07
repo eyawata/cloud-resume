@@ -36,6 +36,9 @@ jobs:
 
       - name: Terraform Init, Plan, Apply
         run: |
+          export TF_LOG=DEBUG
+          export TF_LOG_PATH=tf.log
+          
           cd terraform/dev-account
           terraform init \
             -backend-config="bucket=${{ secrets.BACKEND_BUCKET }}" \
