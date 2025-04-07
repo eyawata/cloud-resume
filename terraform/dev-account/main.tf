@@ -5,11 +5,6 @@ terraform {
       version = "5.89.0"
     }
   }
-
-    backend "s3_backend_state" {
-      # Backend config hidden in local file for security purposes
-      # updated and run with: terraform init -backend-config=backend.config 
-    }
 }
 
 # Default profile
