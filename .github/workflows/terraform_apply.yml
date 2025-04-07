@@ -39,7 +39,8 @@ jobs:
           cd terraform/dev-account
           terraform init \
             -backend-config="bucket=${{ secrets.BACKEND_BUCKET }}" \
-            -backend-config="dynamodb_table=${{ secrets.BACKEND_DYNAMO_TABLE }}" \
+            -backend-config="use_lockfile=true" \
+            -backend-config="lock_table=${{ secrets.BACKEND_DYNAMO_TABLE }}" \
             -backend-config="key=${{ secrets.BACKEND_KEY }}" \
             -backend-config="region=${{ secrets.AWS_BACKEND_REGION }}"
       
