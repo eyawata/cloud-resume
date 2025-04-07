@@ -8,10 +8,10 @@ terraform {
 
 resource "aws_acm_certificate" "cert" {
     provider          = aws
-    domain_name       = var.domain_name
+    domain_name       = "eriyawata.com"
     validation_method = "DNS"
 
-    subject_alternative_names = ["*.${var.domain_name}"]
+    subject_alternative_names = ["*.eriyawata.com"]
 }
 
 output "certificate_arn" {

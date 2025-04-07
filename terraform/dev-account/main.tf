@@ -5,6 +5,8 @@ terraform {
       version = "5.89.0"
     }
   }
+
+  backend "local" {}
 }
 
 # Default profile
@@ -28,14 +30,21 @@ provider "aws" {
   profile = "dns-access"
 }
 
+###############################################################################
+# Module for ACM Certificate Creation
+###############################################################################
+
 module "cert" {
   source         = "./modules/acm_certificate"
-  domain_name    = var.domain_name
 
   providers = {
     aws = aws.us_east_1_dev   # account for ACM
   }
 }
+
+###############################################################################
+# Module for DNS validation (assumes role and validate CNAME records)
+###############################################################################
 
 
 module "cert_dns" {
@@ -55,11 +64,14 @@ resource "aws_acm_certificate_validation" "cert_validation" {
   validation_record_fqdns = [module.cert_dns.fqdn]
 }
 
+###############################################################################
+# Module for Website and Alias Record Setup ("eriyawata.com", "www.eriyawata.com")
+###############################################################################
+
 module "website" {
   source              = "./modules/static_website"
   bucket_name         = var.bucket_name
   acm_certificate_arn = module.cert.certificate_arn
-  domain_name         = var.domain_name
   depends_on = [
     aws_acm_certificate_validation.cert_validation
   ]
@@ -72,7 +84,7 @@ module "website" {
 resource "aws_route53_record" "root_domain_alias" {
   provider = aws.us_east_1_dns
   zone_id  = var.hosted_zone_id
-  name     = var.domain_name
+  name     = "eriyawata.com"
   type     = "A"
 
   alias {
@@ -85,7 +97,7 @@ resource "aws_route53_record" "root_domain_alias" {
 resource "aws_route53_record" "www_subdomain" {
   provider = aws.us_east_1_dns
   zone_id  = var.hosted_zone_id
-  name     = "www.${var.domain_name}"
+  name     = "www.eriyawata.com"
   type     = "A"
 
   alias {
