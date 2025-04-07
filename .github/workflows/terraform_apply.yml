@@ -34,16 +34,18 @@ jobs:
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Terraform Init
-        run: |
-          cd terraform/dev-account
-          terraform init \
-            -backend-config="bucket=${{ secrets.BACKEND_BUCKET }}" \
-            -backend-config="use_lockfile=${{ secrets.BACKEND_DYNAMO_TABLE }}" \
-            -backend-config="key=${{ secrets.BACKEND_KEY }}" \
-            -backend-config=${{ secrets.AWS_BACKEND_REGION }}
-          terraform plan \
-            -var "hosted_zone_id=${{ secrets.HOSTED_ZONE_ID }}" \
-            -var "bucket_name=${{ secrets.WEBSITE_BUCKET_NAME }}" \
-            -out plan.out
-          terraform apply -auto-approve plan.out
+      - name: Terraform Init, Plan, Apply
+      run: |
+        cd terraform/dev-account
+        terraform init \
+          -backend-config="bucket=${{ secrets.BACKEND_BUCKET }}" \
+          -backend-config="dynamodb_table=${{ secrets.BACKEND_DYNAMO_TABLE }}" \
+          -backend-config="key=${{ secrets.BACKEND_KEY }}" \
+          -backend-config="region=${{ secrets.AWS_BACKEND_REGION }}"
+    
+        terraform plan \
+          -var "hosted_zone_id=${{ secrets.HOSTED_ZONE_ID }}" \
+          -var "bucket_name=${{ secrets.WEBSITE_BUCKET_NAME }}" \
+          -out plan.out
+    
+        terraform apply -auto-approve plan.out
