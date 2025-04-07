@@ -6,7 +6,7 @@ terraform {
     }
   }
 
-  backend "local" {}
+  backend "s3" {}
 }
 
 # Default profile
