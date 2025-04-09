@@ -38,6 +38,9 @@ jobs:
         run: terraform fmt -check
         continue-on-error: true
 
+      - name: Get Caller Identity
+        run: aws sts get-caller-identity
+
       - name: Terraform Init, Plan, Apply
         run: |
           export TF_LOG=DEBUG
