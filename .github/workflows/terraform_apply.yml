@@ -59,7 +59,7 @@ jobs:
             -var "github_repo=cloud-resume" \
             -var "hosted_zone_id=${{ secrets.HOSTED_ZONE_ID }}" \
             -var "bucket_name=${{ secrets.WEBSITE_BUCKET_NAME }}" \
-            -var "dev_account_id=${{ secrets.DNS_ACCOUNT_ID }}" \
+            -var "dev_account_id=${{ secrets.DEV_ACCOUNT_ID }}" \
             -out plan.out
       
           terraform apply -auto-approve plan.out
