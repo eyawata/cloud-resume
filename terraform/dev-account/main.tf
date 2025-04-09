@@ -11,21 +11,21 @@ terraform {
 provider "aws" {
   alias = "default"
   region  = "ap-northeast-1"
-  profile = "dev"
 }
 
-# Dev account (where ACM cert is created)
+# Dev account (where ACM cert is created, has to be us-east-1)
 provider "aws" {
   alias   = "us_east_1_dev"
   region  = "us-east-1"
-  profile = "dev"
 }
 
 # DNS account (assumed role to create Route53 validation record)
 provider "aws" {
   alias   = "us_east_1_dns"
   region  = "us-east-1"
-  profile = "dns-access"
+  assume_role {
+    role_arn = "arn:aws:iam::${var.dev_account_id}:role/AllowCertDNSAccess"
+  }
 }
 
 ###############################################################################

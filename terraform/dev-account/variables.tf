@@ -30,3 +30,8 @@ variable "github_repo" {
   description = "GitHub Repository name"
   type        = string
 }
+
+variable "dev_account_id" {
+  description = "Assumed Access Role for DNS validation"
+  type        = string
+}
