@@ -20,13 +20,23 @@ resource "aws_iam_role" "allow_cert_dns_access" {
 
     assume_role_policy = jsonencode({
         Version = "2012-10-17",
-        Statement = [{
-            Effect = "Allow",
-            Principal = {
-                AWS = "arn:aws:iam::${var.dev_account_id}:root"
-            },
-            Action = "sts:AssumeRole"
-        }]
+        Statement = [
+            {
+                Effect = "Allow",
+                Principal = {
+                    Federated = "arn:aws:iam::${var.dev_account_id}:oidc-provider/token.actions.githubusercontent.com"
+                },
+                Action = "sts:AssumeRoleWithWebIdentity",
+                Condition = {
+                    StringLike = {
+                        "token.actions.githubusercontent.com:sub": "repo:eyawata/cloud-resume:ref:refs/heads/master"
+                    },
+                    StringEquals = {
+                        "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+                    }
+                }
+            }
+        ]
     })
 }
 resource "aws_iam_role_policy" "cert_dns_policy" {
