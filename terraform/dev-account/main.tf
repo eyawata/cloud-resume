@@ -5,20 +5,21 @@ terraform {
       version = "5.89.0"
     }
   }
+
+  backend "s3" {
+  }
 }
 
 # Default profile
 provider "aws" {
   alias = "default"
   region  = "ap-northeast-1"
-  profile = "dev"
 }
 
 # Dev account (where ACM cert is created, has to be us-east-1)
 provider "aws" {
   alias   = "us_east_1_dev"
   region  = "us-east-1"
-  profile = "dev"
 }
 
 # DNS account (assumed role to create Route53 validation record)
@@ -142,7 +143,7 @@ resource "aws_iam_role" "github_actions" {
 # Attach AWS-managed policy to Role
 resource "aws_iam_role_policy_attachment" "attach_github_policy" {
   role       = aws_iam_role.github_actions.name
-  policy_arn = "arn:aws:iam::aws:policy/AdminstratorAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 output "github_actions_role_arn" {
