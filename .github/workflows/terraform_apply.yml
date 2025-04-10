@@ -38,8 +38,14 @@ jobs:
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Get Caller Identity
-        run: aws sts get-caller-identity
+      - name: Import GitHub OIDC Provider
+        run: terraform import aws_iam_openid_connect_provider.github_oidc ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
+
+      - name: Import GitHub Actions IAM Role
+        run: terraform import aws_iam_role.github_actions github-actions
+
+      - name: Import S3 Bucket for Website
+        run: terraform import module.static_website.aws_s3_bucket.resume-website-bucket ${{ secrets.BACKEND_BUCKET }}
 
       - name: Terraform Init, Plan, Apply
         run: |
