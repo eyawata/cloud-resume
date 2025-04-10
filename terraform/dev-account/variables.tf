@@ -27,3 +27,7 @@ variable "dev_account_id" {
   description = "Assumed Access Role for DNS validation"
   type        = string
 }
+
+variable "dns_account_id" {
+  type = string
+}

@@ -24,7 +24,7 @@ provider "aws" {
   alias   = "us_east_1_dns"
   region  = "us-east-1"
   assume_role {
-    role_arn = "arn:aws:iam::${var.dev_account_id}:role/AllowCertDNSAccess"
+    role_arn = "arn:aws:iam::${var.dns_account_id}:role/AllowCertDNSAccess"
   }
 }
 
@@ -137,7 +137,7 @@ resource "aws_iam_role" "github_actions" {
     })
 }
 
-# Attach AWS-managed AdministratorAccess policy to Role
+# Attach AWS-managed policy to Role
 resource "aws_iam_role_policy_attachment" "attach_github_policy" {
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
