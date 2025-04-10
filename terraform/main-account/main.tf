@@ -39,7 +39,7 @@ resource "aws_iam_role" "allow_cert_dns_access" {
             {
                 Effect = "Allow",
                 Principal = {
-                    "AWS" = "arn:aws:iam::${var.dev_account_id}:root"
+                    "AWS" = "arn:aws:iam::${var.dns_account_id}:role/github-actions"
                 },
                 Action = "sts:AssumeRole"
             }
