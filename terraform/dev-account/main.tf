@@ -5,9 +5,6 @@ terraform {
       version = "5.89.0"
     }
   }
-
-  backend "s3" {
-  }
 }
 
 # Default profile
@@ -128,7 +125,7 @@ resource "aws_iam_role" "github_actions" {
         Statement = [{
         Effect = "Allow",
         Principal = {
-            Federated = "arn:aws:iam::${var.dev_account_id}:oidc-provider/token.actions.githubusercontent.com"
+            Federated = "arn:aws:iam::${var.dns_account_id}:oidc-provider/token.actions.githubusercontent.com"
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
