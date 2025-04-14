@@ -41,6 +41,7 @@ jobs:
 
       - name: Create backend configuration file
         run: |
+          cd terraform/dev-account
           cat <<EOF > backend.tfvars
           bucket = "${{ secrets.BACKEND_BUCKET_NAME }}"
           key = "terraform/state/terraform.tfstate"
