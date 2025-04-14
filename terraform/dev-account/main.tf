@@ -7,11 +7,6 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = backend_bucket_name
-    key            = "terraform/state/terraform.tfstate"
-    region         = "ap-northeast-1"
-    encrypt        = true
-    dynamodb_table = backend_dynamodb_name
   }
 }
 
@@ -119,6 +114,7 @@ resource "aws_route53_record" "www_subdomain" {
 
 # OIDC Identity Provider for GitHub Actions
 resource "aws_iam_openid_connect_provider" "github_oidc" {
+    provider = aws.default
     url             = "https://token.actions.githubusercontent.com"
     client_id_list  = ["sts.amazonaws.com"]
     thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"] # GitHub OIDC cert thumbprint

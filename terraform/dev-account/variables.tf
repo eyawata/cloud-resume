@@ -31,11 +31,3 @@ variable "dev_account_id" {
 variable "dns_account_id" {
   type = string
 }
-
-variable "backend_bucket_name" {
-  type = string
-}
-
-variable "backend_dynamodb_name" {
-  type = string
-}

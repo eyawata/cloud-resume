@@ -43,6 +43,8 @@ jobs:
         run: |
           cat <<EOF > backend.tfvars
           bucket = "${{ secrets.BACKEND_BUCKET_NAME }}"
+          key = "terraform/state/terraform.tfstate"
+          encrypt        = true
           dynamodb_table = "${{ secrets.BACKEND_DYNAMO_TABLE }}"
           region = "${{ secrets.AWS_BACKEND_REGION }}"
           EOF
