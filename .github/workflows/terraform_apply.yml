@@ -32,20 +32,20 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.11.3
+      
 
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
         continue-on-error: true
 
-      - name: Import GitHub OIDC Provider
-        run: terraform import aws_iam_openid_connect_provider.github_oidc ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
-
-      - name: Import GitHub Actions IAM Role
-        run: terraform import aws_iam_role.github_actions github-actions
-
-      - name: Import S3 Bucket for Website
-        run: terraform import module.static_website.aws_s3_bucket.resume-website-bucket ${{ secrets.BACKEND_BUCKET }}
+      - name: Create backend configuration file
+        run: |
+          cat <<EOF > backend.tfvars
+          bucket = "${{ secrets.BACKEND_BUCKET_NAME }}"
+          dynamodb_table = "${{ secrets.BACKEND_DYNAMO_TABLE }}"
+          region = "${{ secrets.AWS_BACKEND_REGION }}"
+          EOF
 
       - name: Terraform Init, Plan, Apply
         run: |
@@ -53,12 +53,7 @@ jobs:
           export TF_LOG_PATH=tf.log
           
           cd terraform/dev-account
-          terraform init \
-            -backend-config="bucket=${{ secrets.BACKEND_BUCKET }}" \
-            -backend-config="use_lockfile=true" \
-            -backend-config="lock_table=${{ secrets.BACKEND_DYNAMO_TABLE }}" \
-            -backend-config="key=${{ secrets.BACKEND_KEY }}" \
-            -backend-config="region=${{ secrets.AWS_BACKEND_REGION }}"
+          terraform init -backend-config=backend.tfvars
       
           terraform plan \
             -var "github_org=eyawata" \

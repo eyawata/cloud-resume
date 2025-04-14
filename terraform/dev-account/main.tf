@@ -5,6 +5,14 @@ terraform {
       version = "5.89.0"
     }
   }
+
+  backend "s3" {
+    bucket         = backend_bucket_name
+    key            = "terraform/state/terraform.tfstate"
+    region         = "ap-northeast-1"
+    encrypt        = true
+    dynamodb_table = backend_dynamodb_name
+  }
 }
 
 # Default profile
@@ -73,7 +81,7 @@ module "website" {
   depends_on = [
     aws_acm_certificate_validation.cert_validation
   ]
-
+  
   providers = {
     aws = aws.default
   }
@@ -118,6 +126,7 @@ resource "aws_iam_openid_connect_provider" "github_oidc" {
 
 # IAM Role for GitHub Actions
 resource "aws_iam_role" "github_actions" {
+    provider = aws.default
     name = var.iam_role_name
 
     assume_role_policy = jsonencode({
@@ -125,7 +134,7 @@ resource "aws_iam_role" "github_actions" {
         Statement = [{
         Effect = "Allow",
         Principal = {
-            Federated = "arn:aws:iam::${var.dns_account_id}:oidc-provider/token.actions.githubusercontent.com"
+            Federated = "arn:aws:iam::${var.dev_account_id}:oidc-provider/token.actions.githubusercontent.com"
         },
         Action = "sts:AssumeRoleWithWebIdentity",
         Condition = {
@@ -139,6 +148,7 @@ resource "aws_iam_role" "github_actions" {
 
 # Attach AWS-managed policy to Role
 resource "aws_iam_role_policy_attachment" "attach_github_policy" {
+  provider = aws.default
   role       = aws_iam_role.github_actions.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
