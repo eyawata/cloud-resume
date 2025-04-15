@@ -115,7 +115,7 @@ resource "aws_s3_bucket_policy" "private_bucket_policy" {
 }
 
 # invalidate cache immediately to serve new content
-resource "aws_cloudfront_distribution_invalidation" "invalidate_index" {
+resource "aws_cloudfront_invalidation" "invalidate_index" {
     distribution_id = aws_cloudfront_distribution.s3_distribution_oac.id
     paths           = ["/index.html"]
 }
