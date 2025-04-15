@@ -29,6 +29,15 @@ resource "aws_s3_object" "resume-website" {
     source_hash  = filemd5("../../static-website/index.html")
 }
 
+resource "aws_s3_object" "get_count_js" {
+    provider = aws
+    bucket       = aws_s3_bucket.resume-website-bucket.id
+    key          = "get_count.js"
+    source       = "../../static-website/get_count.js"  # Adjust the path if needed
+    content_type = "application/javascript"
+    source_hash  = filemd5("../../static-website/get_count.js")
+}
+
 ###############################################################################
 # Cloudfront Setup
 ###############################################################################
