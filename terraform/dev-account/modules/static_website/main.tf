@@ -27,6 +27,7 @@ resource "aws_s3_object" "resume-website" {
     source       = "../../static-website/index.html"
     content_type = "text/html"
     source_hash  = filemd5("../../static-website/index.html")
+    cache_control = "max-age=60, no-cache"
 }
 
 resource "aws_s3_object" "get_count_js" {
@@ -111,4 +112,10 @@ resource "aws_s3_bucket_policy" "private_bucket_policy" {
             }
         ]
     })
+}
+
+# invalidate cache immediately to serve new content
+resource "aws_cloudfront_distribution_invalidation" "invalidate_index" {
+    distribution_id = aws_cloudfront_distribution.s3_distribution_oac.id
+    paths           = ["/index.html"]
 }
