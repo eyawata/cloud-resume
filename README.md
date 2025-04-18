@@ -8,5 +8,30 @@ This project hosts my personal resume as a static website on AWS, managed entire
 - **Remote state** stored in **S3** with **DynamoDB** locking 
 
 ## Architecture Diagram
-<!-- Embed your draw.io diagram below -->
 ![Architecture Diagram](cloud-resume-diagram.drawio.png)
+
+# 🚀 Resources That Helped Me
+
+## 📺 YouTube
+
+- [@wahlnetwork](https://www.youtube.com/@wahlnetwork)  
+  Great for learning Terraform and cloud tools
+
+- [4 Considerations to Structure Terraform Code](https://www.youtube.com/watch?v=qKxQeB5pq7k)  
+  by *This is GitOps*
+
+## 📘 Books
+
+- *The DevOps Handbook*  
+  Still reading this one—been great so far!
+
+## 🌐 Online Articles
+
+- [150+ blogposts by others who did the challenge](https://medium.com/tag/cloud-resume-challenge)
+
+- [DevOps.dev](https://devops.dev)
+
+## 🎓 Courses
+
+- [Stephane Maarek on Udemy](https://www.udemy.com/user/stephane-maarek/)  
+  Great if you’re new to AWS cloud
