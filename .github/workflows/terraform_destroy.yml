@@ -1,0 +1,56 @@
+name: "Rolling Back"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read # Required to check out repo
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # https://github.com/actions/checkout
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4 # https://github.com/aws-actions/configure-aws-credentials
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE }}
+          aws-region: ${{ secrets.AWS_BACKEND_REGION }}
+
+      - name: Verify AWS access
+        run: aws s3 ls
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.11.3     
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Create backend configuration file
+        run: |
+          cd terraform/dev-account
+          cat <<EOF > backend.tfvars
+          bucket = "${{ secrets.BACKEND_BUCKET_NAME }}"
+          key = "terraform/state/terraform.tfstate"
+          encrypt        = true
+          dynamodb_table = "${{ secrets.BACKEND_DYNAMO_TABLE }}"
+          region = "${{ secrets.AWS_BACKEND_REGION }}"
+          EOF
+
+      - name: Terraform Init and Destroy
+        run: |
+          export TF_LOG=DEBUG
+          export TF_LOG_PATH=tf.log
+          
+          cd terraform/dev-account
+          terraform init -backend-config=backend.tfvars
+      
+          terraform destroy -auto-approve plan.out
