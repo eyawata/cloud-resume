@@ -62,5 +62,5 @@ jobs:
             -var "dns_account_id=${{ secrets.DNS_ACCOUNT_ID }}" \
             -out plan.out
 
-          terraform destroy -auto-approve
+          terraform destroy -auto-approve plan.out
         continue-on-error: true
