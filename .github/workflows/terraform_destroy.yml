@@ -52,5 +52,14 @@ jobs:
           
           cd terraform/dev-account
           terraform init -backend-config=backend.tfvars
-      
+          
+          terraform plan \
+            -var "github_org=eyawata" \
+            -var "github_repo=cloud-resume" \
+            -var "hosted_zone_id=${{ secrets.HOSTED_ZONE_ID }}" \
+            -var "bucket_name=${{ secrets.WEBSITE_BUCKET_NAME }}" \
+            -var "dev_account_id=${{ secrets.DEV_ACCOUNT_ID }}" \
+            -var "dns_account_id=${{ secrets.DNS_ACCOUNT_ID }}" \
+            -out plan.out
+
           terraform destroy -auto-approve plan.out
